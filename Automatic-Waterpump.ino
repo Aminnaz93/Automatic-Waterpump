@@ -1,6 +1,7 @@
 #include <Wire.h>             // För I2C-kommunikation
 #include <LiquidCrystal_I2C.h> // För LCD med I2C
 
+//SDA = A4 SCL = A5 VCC = 5V GND = GND
 // Skapa ett LCD-objekt med adress 0x27 och en 16x2 display
 LiquidCrystal_I2C lcd(0x27, 16, 2);  
 
