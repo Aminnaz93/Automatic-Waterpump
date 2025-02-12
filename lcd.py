@@ -20,14 +20,3 @@ while True:
     sleep(2)
     lcd.clear()  # Rensa LCD:n efter 2 sekunder
     sleep(1)
-
-    # Visa en räknare från 0 till 10 på LCD:n
-    lcd.putstr("Lets Count 0-10!")
-    sleep(2)
-    lcd.clear()
-
-
-    for i in range(11):
-        lcd.putstr(str(i))  # Skriv ut räknaren
-        sleep(1)
-        lcd.clear()  # Rensa LCD:n varje gång

@@ -18,7 +18,7 @@ lcd = I2cLcd(i2c, I2C_ADDR, totalRows, totalColumns)'''
 sensor_pin = Pin("D5", Pin.IN)
 
 # Anslut reläets styrpinne till en digital pin (t.ex. Pin 12)
-relay_pin = Pin("D2", machine.Pin.OUT)
+relay_pin = Pin("D12", machine.Pin.OUT)
 
 while True:
     sensor_value = sensor_pin.value()  # Läs av sensorvärdet (HIGH eller LOW)
