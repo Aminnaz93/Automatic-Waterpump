@@ -31,8 +31,12 @@ def connect_wifi():
         sleep(1)
         
     print("Ansluten till Wifi")
+    publish_status("Ansluten till wifi")  # Publicera status när Wi-Fi är anslutet
 
-connect_wifi()
+# Skapa en funktion för att publicera status via MQTT
+def publish_status(status):
+    mqtt_client.publish(TOPIC, status)  # Publicera till MQTT-topic
+    print(f"Publicerat status: {status}")  # Skriv ut på konsolen
 
 # Skapa MQTT-klient och anslut till broker
 mqtt_client = MQTTClient(CLIENT_NAME, BROKER_ADDR)
@@ -53,6 +57,9 @@ def callback_print(topic, msg):
 # Sätt callback-funktion och prenumerera på ämnet
 mqtt_client.set_callback(callback_print)
 mqtt_client.subscribe(TOPIC)
+
+# Anslut till Wi-Fi
+connect_wifi()
 
 # Huvudloop för att ta emot meddelanden och visa status på LCD
 while True:
