@@ -1,0 +1,85 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2821
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 import machine\
+from machine import Pin, SoftI2C\
+from time import sleep\
+from umqtt.simple import MQTTClient\
+import network\
+\
+# Wi-Fi inst\'e4llningar\
+ssid = "Tele2_42c7d0"\
+password = "rgjvdzxq"\
+\
+# MQTT inst\'e4llningar\
+CLIENT_NAME = "esp32_waterpump"\
+BROKER_ADDR = "broker.hivemq.com"\
+TOPIC = "Waterpump"  # \'c4mnet du anv\'e4nder f\'f6r att publicera och prenumerera\
+\
+# Anslut till Wi-Fi\
+def connect_wifi():\
+    wlan = network.WLAN(network.STA_IF)\
+    wlan.active(True)  # Aktivera Wi-Fi\
+    wlan.connect(ssid, password)\
+    \
+    while not wlan.isconnected():\
+        print("F\'f6rs\'f6ker ansluta till Wi-Fi...")\
+        sleep(1)\
+        \
+    print("Ansluten till Wi-Fi!")\
+\
+connect_wifi()\
+\
+# Skapa MQTT-klient och anslut till broker\
+mqtt_client = MQTTClient(CLIENT_NAME, BROKER_ADDR)\
+\
+# Anslut till MQTT\
+try:\
+    mqtt_client.connect()\
+    print("Ansluten till MQTT-broker")\
+except Exception as e:\
+    print("Kunde inte ansluta till MQTT-broker:", e)\
+\
+# Anslut sensorns signal till en digital pin (t.ex. Pin 14)\
+sensor_pin = Pin("D5", Pin.IN)\
+\
+# Anslut rel\'e4ets styrpinne till en digital pin (t.ex. Pin 12)\
+relay_pin = Pin("D12", machine.Pin.OUT)\
+\
+# Funktion f\'f6r att publicera status (pump p\'e5/av)\
+def publish_status(status):\
+    mqtt_client.publish(TOPIC, status)\
+    print(f"Publicerat status: \{status\}")\
+\
+# Callback-funktion f\'f6r att ta emot meddelanden via MQTT\
+def callback_print(topic, msg):\
+    print(f"Fr\'e5n topic \{topic\}: \{msg\}")\
+    if msg == b"turn_on":\
+        relay_pin.on()  # Sl\'e5 p\'e5 pumpen\
+        publish_status("Pump on")\
+    elif msg == b"turn_off":\
+        relay_pin.off()  # St\'e4ng av pumpen\
+        publish_status("Pump off")\
+\
+# S\'e4tt callback-funktion och prenumerera p\'e5 ett \'e4mne\
+mqtt_client.set_callback(callback_print)\
+mqtt_client.subscribe(TOPIC)\
+\
+while True:\
+    sensor_value = sensor_pin.value()  # L\'e4s av sensorv\'e4rdet (HIGH eller LOW)\
+    \
+    if sensor_value == 1:\
+        # Jorden \'e4r torr, sl\'e5 p\'e5 pumpen\
+        relay_pin.on()  # Sl\'e5 p\'e5 rel\'e4et (pumpen startar)\
+        publish_status("Soil is dry, watering")\
+    else:\
+        # Jorden \'e4r v\'e5t, st\'e4ng av pumpen\
+        relay_pin.off()  # St\'e4ng av rel\'e4et (pumpen stoppas)\
+        publish_status("Soil is wet, no watering")\
+\
+    mqtt_client.check_msg()  # Kontrollera om nya meddelanden har tagits emot via MQTT\
+    sleep(1)  # V\'e4nta en sekund innan n\'e4sta m\'e4tning}

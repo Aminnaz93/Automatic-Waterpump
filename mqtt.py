@@ -47,7 +47,7 @@ def callback_print(topic, msg):
     print(f"Från topic {topic}: {msg}")
     if msg == b"turn_on":
         relay_pin.on()  # Slå på pumpen
-        publish_status("Pump on")
+        publiash_status("Pump on")
     elif msg == b"turn_off":
         relay_pin.off()  # Stäng av pumpen
         publish_status("Pump off")
