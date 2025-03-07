@@ -10,7 +10,7 @@ password = "rgjvdzxq"
 
 # MQTT inställningar
 CLIENT_NAME = "esp32_waterpump"
-BROKER_ADDR = "broker.hivemq.com"
+BROKER_ADDR = "test.mosquitto.org"
 TOPIC = "Waterpump"  # Ämnet du använder för att publicera och prenumerera
 
 # Anslut till Wi-Fi
@@ -47,10 +47,10 @@ def callback_print(topic, msg):
     print(f"Från topic {topic}: {msg}")
     if msg == b"turn_on":
         relay_pin.on()  # Slå på pumpen
-        publiash_status("Pump on")
+        publish_status("Pump on")  # Rätt funktion här
     elif msg == b"turn_off":
         relay_pin.off()  # Stäng av pumpen
-        publish_status("Pump off")
+        publish_status("Pump off")  # Rätt funktion här
 
 # Sätt callback-funktion och prenumerera på ett ämne
 mqtt_client.set_callback(callback_print)
