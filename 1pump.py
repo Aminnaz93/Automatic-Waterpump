@@ -9,7 +9,7 @@ ssid = "Tele2_42c7d0"
 password = "rgjvdzxq"
 
 # MQTT inställningar
-CLIENT_NAME = "esp32_waterpump"
+CLIENT_NAME = "esp32_waterpump10"
 BROKER_ADDR = "test.mosquitto.org"
 TOPIC = "Waterpump"  # Ämnet du använder för att publicera och prenumerera
 

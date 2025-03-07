@@ -11,7 +11,7 @@ ssid = "Tele2_42c7d0"
 password = "rgjvdzxq"
 
 # MQTT inställningar
-CLIENT_NAME = "esp32_waterpump"
+CLIENT_NAME = "esp32_waterpump10"
 BROKER_ADDR = "test.mosquitto.org"  # Använd en korrekt brokeradress här
 TOPIC = "Waterpump"
 
@@ -44,6 +44,7 @@ mqtt_client = MQTTClient(CLIENT_NAME, BROKER_ADDR)
 # Initialisera I2C och LCD
 i2c = SoftI2C(scl=Pin("A5"), sda=Pin("A4"), freq=100000)  # Använd GPIO21 (SDA) och GPIO22 (SCL)
 lcd = I2cLcd(i2c, I2C_ADDR, totalRows, totalColumns)
+
 
 # Callback-funktion för att ta emot meddelanden via MQTT
 def callback_print(topic, msg):
