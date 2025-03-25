@@ -1,5 +1,5 @@
 import machine
-from machine import Pin, SoftI2C
+from machine import Pin
 from time import sleep
 from umqtt.simple import MQTTClient
 import network
@@ -9,7 +9,7 @@ ssid = "Tele2_42c7d0"
 password = "rgjvdzxq"
 
 # MQTT inställningar
-CLIENT_NAME = "esp32_waterpump10"
+CLIENT_NAME = "esp32_waterpump"
 BROKER_ADDR = "test.mosquitto.org"
 TOPIC = "Waterpump"  # Ämnet du använder för att publicera och prenumerera
 
@@ -31,8 +31,9 @@ connect_wifi()
 mqtt_client = MQTTClient(CLIENT_NAME, BROKER_ADDR)
 mqtt_client.connect()
 
-# Anslut sensorns signal till en digital pin (t.ex. Pin 14)
-MoistureSensor_pin = Pin("D5", Pin.IN)
+# Anslut sensorns signaler till digitala pinnar
+MoistureSensor_pin = Pin("D5", Pin.IN)  # Jordfuktighetssensor
+WaterLevelSensor_pin = Pin("D6", Pin.IN)  # Vätskenivåsensor
 
 # Anslut reläets styrpinne till en digital pin (t.ex. Pin 12)
 relay_pin = Pin("D12", machine.Pin.OUT)
@@ -40,31 +41,37 @@ relay_pin = Pin("D12", machine.Pin.OUT)
 # Funktion för att publicera status (pump på/av)
 def publish_status(status):
     mqtt_client.publish(TOPIC, status)
-    print(f"Publicerat status: {status}")
+    print(f"Publicerat status: {status}")  # Skriv ut på konsolen
 
 # Callback-funktion för att ta emot meddelanden via MQTT
 def callback_print(topic, msg):
     print(f"Från topic {topic}: {msg}")
     if msg == b"turn_on":
         relay_pin.on()  # Slå på pumpen
-        publish_status("Pump on")  # Rätt funktion här
+        publish_status("Pump on")  # Publicera status
     elif msg == b"turn_off":
         relay_pin.off()  # Stäng av pumpen
-        publish_status("Pump off")  # Rätt funktion här
+        publish_status("Pump off")  # Publicera status
 
 # Sätt callback-funktion och prenumerera på ett ämne
 mqtt_client.set_callback(callback_print)
 mqtt_client.subscribe(TOPIC)
 
 while True:
-    sensor_value = MoistureSensor_pin.value()  # Läs av sensorvärdet (HIGH eller LOW)
+    moisture_value = MoistureSensor_pin.value()  # Läs av sensorvärdet för jordfuktighet
+    water_level_value = WaterLevelSensor_pin.value()  # Läs av sensorvärdet för vätskenivå
     
-    if sensor_value == 1:
-        # Jorden är torr, slå på pumpen
+    # Kontrollera om både jorden är torr och det finns vätska i flaskan
+    if moisture_value == 1 and water_level_value == 1:
+        # Jorden är torr, och vätska detekteras, slå på pumpen
         relay_pin.on()  # Slå på reläet (pumpen startar)
-        publish_status("Soil is dry, watering")
+        publish_status("Soil is dry, watering")  # Publicera till MQTT
+    elif water_level_value == 0:
+        # Ingen vätska detekteras, publicera meddelande och stäng av pumpen
+        relay_pin.off()  # Stäng av reläet (pumpen stoppas)
+        publish_status("No water detected")
     else:
-        # Jorden är våt, stäng av pumpen
+        # Antingen jorden är våt eller ingen vätska detekteras, stäng av pumpen
         relay_pin.off()  # Stäng av reläet (pumpen stoppas)
         publish_status("Soil is wet, no watering")
 
