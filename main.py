@@ -1,3 +1,4 @@
+#2pump.py
 import machine
 from machine import Pin
 from time import sleep
@@ -47,6 +48,7 @@ def publish_status(status):
 def callback_print(topic, msg):
     print(f"Från topic {topic}: {msg}")
     if msg == b"turn_on":
+        
         relay_pin.on()  # Slå på pumpen
         publish_status("Pump on")  # Publicera status
     elif msg == b"turn_off":
