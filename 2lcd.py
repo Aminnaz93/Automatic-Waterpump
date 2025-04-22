@@ -1,4 +1,3 @@
-#2lcd.py
 import machine
 from machine import Pin, SoftI2C
 from time import sleep, ticks_ms
@@ -13,7 +12,7 @@ password = "rgjvdzxq"
 
 # ---- MQTT-inställningar ----
 CLIENT_NAME = "esp32_waterpump10"
-BROKER_ADDR = "test.mosquitto.org"
+BROKER_ADDR = "broker.hivemq.com"
 TOPIC = "Waterpump"
 
 # ---- I2C och LCD-inställningar ----
@@ -23,10 +22,20 @@ totalColumns = 16
 i2c = SoftI2C(scl=Pin("A5"), sda=Pin("A4"), freq=100000)
 lcd = I2cLcd(i2c, I2C_ADDR, totalRows, totalColumns)
 
-# ---- Knapp-inställning ----
+# ---- Knapp med interrupt + debounce ----
 button_pin = Pin("D4", Pin.IN, Pin.PULL_UP)
 last_press_time = 0
-debounce_delay = 200  # ms
+debounce_delay = 200  # millisekunder
+
+def handle_button(pin):
+    global last_press_time
+    current_time = ticks_ms()
+    if current_time - last_press_time > debounce_delay:
+        print("Pump on")
+        publish_status(b"turn_on")
+        last_press_time = current_time
+
+button_pin.irq(trigger=Pin.IRQ_FALLING, handler=handle_button)
 
 # ---- Anslut till Wi-Fi ----
 def connect_wifi():
@@ -39,7 +48,6 @@ def connect_wifi():
         sleep(1)
         
     print("Ansluten till Wi-Fi!")
-    print("IP-adress:", wlan.ifconfig()[0])
 
 # ---- Skapa MQTT-klient och publicera status ----
 mqtt_client = MQTTClient(CLIENT_NAME, BROKER_ADDR)
@@ -52,7 +60,7 @@ def publish_status(status):
 def callback_print(topic, msg):
     print(f"Från topic {topic}: {msg}")
     lcd.clear()
-    lcd.putstr(msg.decode())  # Visa på LCD:n
+    lcd.putstr(msg.decode())  # Visa meddelande på LCD
 
 # ---- Initiering ----
 connect_wifi()
@@ -66,14 +74,5 @@ lcd.putstr("Vattensystem aktivt")
 
 # ---- Huvudloop ----
 while True:
-    mqtt_client.check_msg()  # Tar emot meddelanden (t.ex. för LCD)
-    
-    # Kolla knapp
-    if not button_pin.value():  # Knappen är tryckt
-        current_time = ticks_ms()
-        if current_time - last_press_time > debounce_delay:
-            print("Knappen tryckt – skickar 'turn_on'")
-            publish_status(b"turn_on")
-            last_press_time = current_time
-
-    sleep(1)
+    mqtt_client.check_msg()  # Tar emot meddelanden till LCD
+    sleep(0.1)  # Kort delay för att inte blockera
