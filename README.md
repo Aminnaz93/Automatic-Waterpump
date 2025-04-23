@@ -42,8 +42,8 @@ Detta projekt är ett automatiskt bevattningssystem som använder två ESP32 Nan
 | Bild | Beskrivning |
 |------|-------------|
 | ![LCD och knapp på breadboard](IMG_8478%20-%20stor.jpeg) | ESP32 med LCD-display och grön knapp på breadboard. Visar meddelande från systemet. |
-| ![Komponentlåda med ESP32 och relä](IMG_8480%20-%20stor.jpeg) | Inuti plastlådan: ESP32 kopplat till relä och strömmatning, snyggt organiserat på breadboard. |
-| ![Vattenbehållare med pump](IMG_8481%20-%20stor.jpeg) | Vattenbehållaren med pumpens slang och kontakt. Här tas vatten för att vattna växten. |
+| ![Komponentlåda med ESP32 och relä](IMG_8480%20-%20stor.jpeg) | Inuti plastlådan: ESP32 kopplat till komponenternadas, snyggt organiserat på breadboard. |
+| ![Vattenbehållare med pump](IMG_8481%20-%20stor.jpeg) | Vätskenivåsensor fastklistrad utanför behållaren. |
 
 ---
 
