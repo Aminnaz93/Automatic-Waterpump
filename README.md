@@ -47,18 +47,6 @@ Detta projekt är ett automatiskt bevattningssystem som använder två ESP32 Nan
 
 ---
 
-## 🎥 Video (valfritt)
-
-👉 Lägg till en länk här om du har en video, t.ex.:
-
-[▶️ Se demo på YouTube](https://youtu.be/DIN-LÄNK-HÄR)
-
-Eller:
-
-[▶️ Ladda ner demo-video](demo_video.mp4)
-
----
-
 ## ▶️ Användning
 
 1. Ladda upp `2lcd.py` till första ESP32 (styrning)
