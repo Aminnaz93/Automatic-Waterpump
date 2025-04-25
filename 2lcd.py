@@ -27,6 +27,8 @@ button_pin = Pin("D4", Pin.IN, Pin.PULL_UP)
 last_press_time = 0
 debounce_delay = 200  # millisekunder
 
+##### När knappen trycks ned skickas ett MQTT-meddelande ("turn_on") om att starta pumpen #####
+##### Debounce används för att förhindra att flera signaler skickas vid ett enda knapptryck #####
 def handle_button(pin):
     global last_press_time
     current_time = ticks_ms()
