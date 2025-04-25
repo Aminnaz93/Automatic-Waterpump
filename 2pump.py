@@ -80,7 +80,7 @@ while True:
         relay_pin.off()
         publish_status("No water detected")
     else:
-        # Antingen jorden är våt eller ingen vätska detekteras, stäng av pumpen
+        # Antingen jorden är våt eller ingen vaytten detekteras, stäng av pumpen
         relay_pin.off()
         publish_status("Soil is wet, no watering")
 
